@@ -1,5 +1,3 @@
-import datetime
-import os
 
 from discord.ext import tasks
 
@@ -16,5 +14,3 @@ class FanTasks(CogsExtension):
     # def cog_load(self):
 
     # def cog_unload(self):
-
-

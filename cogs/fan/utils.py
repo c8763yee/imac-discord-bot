@@ -5,14 +5,11 @@ import re
 from enum import IntEnum
 from typing import Optional
 
-
 import discord
 from aiomqtt import Client
 from dotenv import load_dotenv
 
 from cogs import CogsExtension
-from core.models import Field
-
 from loggers import setup_package_logger
 
 if os.path.exists('.env'):
@@ -55,9 +52,10 @@ TURN_OFF_FAN_PAYLOAD = {
     FanPosition.MEETING_ROOM: {'fan_0': 'OFF'}
 }
 
+
 class FanUtils(CogsExtension):
     TOPIC_PREFIX = "2706/IAQ"
-    
+
     async def turn_on(self, fan_position: FanPosition) -> str:
         async with Client(MQTT_BROKER, MQTT_PORT) as client:
             await client.publish(f"{self.TOPIC_PREFIX}/{fan_position}/control",
@@ -68,6 +66,5 @@ class FanUtils(CogsExtension):
         async with Client(MQTT_BROKER, MQTT_PORT) as client:
             await client.publish(f"{self.TOPIC_PREFIX}/{fan_position}/control",
                                  json.dumps(TURN_OFF_FAN_PAYLOAD[fan_position]))
-            
-        return f"Turned off fan {fan_position.name}"
 
+        return f"Turned off fan {fan_position.name}"
