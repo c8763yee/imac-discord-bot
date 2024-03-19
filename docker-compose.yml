@@ -1,0 +1,11 @@
+services:
+  bot:
+    build: .
+    image: bot
+    container_name: bot
+    volumes:
+      - ./logs:/app/logs:rw
+    restart: always
+networks:
+  bot:
+    driver: bridge

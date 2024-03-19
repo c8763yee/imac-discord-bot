@@ -1,0 +1,8 @@
+aiofiles
+aiohttp
+aiomqtt
+discord.py[voice]
+openai
+psutil
+python-dotenv
+requests
