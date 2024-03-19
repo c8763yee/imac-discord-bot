@@ -17,6 +17,7 @@ if os.path.exists('.env'):
     load_dotenv('.env', verbose=True, override=True)
 os.umask(0o000)
 logger = setup_package_logger('main', file_level=logging.INFO)
+ALL_GUILD = None  # yes it's mean to sync all guilds
 
 
 @tasks.loop(minutes=1)
@@ -45,7 +46,7 @@ class Bot(commands.Bot):
             await channel.send(f"`{modules}` loaded", silent=True)
 
         update_time.start()
-        await self.tree.sync()
+        await self.tree.sync(guild=ALL_GUILD)
         # mention owner when ready
         await channel.send(
             f"{self.user} is ready. <@{os.environ['OWNER_ID']}>",
@@ -105,7 +106,7 @@ async def load(ctx: commands.Context, extension: str):
 
     await ctx.interaction.response.defer()
     await bot.load_extension(f"cogs.{extension}")
-    await bot.tree.sync()
+    await bot.tree.sync(guild=ALL_GUILD)
     await ctx.interaction.followup.send(f"`{extension}` loaded", ephemeral=True)
 
 
@@ -115,7 +116,7 @@ async def unload(ctx: commands.Context, extension: str):
     """Unload extension.(owner only)"""
     await ctx.interaction.response.defer()
     await bot.unload_extension(f"cogs.{extension}")
-    await bot.tree.sync()
+    await bot.tree.sync(guild=ALL_GUILD)
     await ctx.interaction.followup.send(f"`{extension}` unloaded", ephemeral=True)
 
 
@@ -126,7 +127,7 @@ async def reload(ctx: commands.Context, extension: str):
     # if new commands are added into cogs, sync the tree
     await ctx.interaction.response.defer()
     await bot.reload_extension(f"cogs.{extension}")
-    await bot.tree.sync()
+    await bot.tree.sync(guild=ALL_GUILD)
     await ctx.interaction.followup.send(f"`{extension}` reloaded", ephemeral=True)
 
 
@@ -140,4 +141,3 @@ if __name__ == "__main__":
     """
     )
     bot.run(os.environ["DISCORD_BOT_TOKEN"], log_handler=None)
-
