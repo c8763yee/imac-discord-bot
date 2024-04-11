@@ -1,14 +1,14 @@
 # from discord.ext import tasks
 
 from cogs import CogsExtension
-from .utils import FanUtils
+from .utils import AirConditionUtils
 
 
-class FanTasks(CogsExtension):
+class AirConditionTasks(CogsExtension):
     # variables
     def __init__(self, bot):
         super().__init__(bot)
-        self.utils = FanUtils(bot)
+        self.utils = AirConditionUtils(bot)
 
     # def cog_load(self):
 

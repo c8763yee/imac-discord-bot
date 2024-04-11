@@ -1,12 +1,10 @@
-from typing import Literal, Optional
-
-import discord
 from discord.ext import commands
 
 from loggers import setup_package_logger
 
 from .tasks import FanTasks
 from .utils import FanPosition
+
 logger = setup_package_logger(__name__)
 
 
