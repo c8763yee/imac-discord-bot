@@ -2,55 +2,43 @@ import logging
 import os
 import sys
 import traceback
-from datetime import datetime
 from textwrap import dedent
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 from dotenv import load_dotenv
 
 from cogs import CogsExtension
 from core.models import Field
-from loggers import setup_package_logger, TZ
+from loggers import setup_package_logger
 
-if os.path.exists('.env'):
-    load_dotenv('.env', verbose=True, override=True)
+if os.path.exists(".env"):
+    load_dotenv(".env", verbose=True, override=True)
 os.umask(0o000)
-logger = setup_package_logger('main', file_level=logging.INFO)
+logger = setup_package_logger("main", file_level=logging.INFO)
 ALL_GUILD = None  # yes it's mean to sync all guilds
-
-
-@tasks.loop(minutes=1)
-async def update_time():
-    now = datetime.now(tz=TZ)
-    await bot.change_presence(
-        activity=discord.CustomActivity(
-            name=f'現在時間： {now.strftime("%Y-%m-%d %H:%M")}',
-            emoji=discord.PartialEmoji(name="🕒")
-        )
-    )
 
 
 class Bot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger: logging.Logger = setup_package_logger(
-            __name__, file_level=logging.INFO)
+            __name__, file_level=logging.INFO
+        )
 
     async def on_ready(self):
         import cogs
+
         channel = self.get_channel(int(os.environ["TEST_CHANNEL_ID"]))
 
         for modules in cogs.__all__:
             await self.load_extension(f"cogs.{modules}")
             await channel.send(f"`{modules}` loaded", silent=True)
 
-        update_time.start()
         await self.tree.sync(guild=ALL_GUILD)
         # mention owner when ready
         await channel.send(
-            f"{self.user} is ready. <@{os.environ['OWNER_ID']}>",
-            silent=True
+            f"{self.user} is ready. <@{os.environ['OWNER_ID']}>", silent=True
         )
 
     async def on_command_error(self, ctx: commands.Context, error):
@@ -73,20 +61,27 @@ class Bot(commands.Bot):
         error_type = error.__class__.__name__
         error_message = str(error)
         self.logger.exception(error)
-        await ctx.send(embed=await CogsExtension.create_embed(
-            "Error occurred",
-            f"\n{error_type} occurred at line {error_line}, character {error_char}\n",
-            discord.Color.red(),
-            None,
-            Field(name="Error info", value=dedent(f"""
+        await ctx.send(
+            embed=await CogsExtension.create_embed(
+                "Error occurred",
+                f"\n{error_type} occurred at line {error_line}, character {error_char}\n",
+                discord.Color.red(),
+                None,
+                Field(
+                    name="Error info",
+                    value=dedent(f"""
             Position: `{error_line}:{error_char}`
             Error message: 
             ```py
             {error_message}
             ```
             Error Type: `{error_type}`
-            """), inline=False),
-        ), silent=True)
+            """),
+                    inline=False,
+                ),
+            ),
+            silent=True,
+        )
 
 
 # ---------------------------- Initialising the bot ---------------------------- #
