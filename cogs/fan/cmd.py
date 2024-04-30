@@ -22,3 +22,8 @@ class FanCMD(FanTasks):
     @commands.has_permissions(administrator=True)
     async def fan_off(self, ctx: commands.Context, fan_position: FanPosition):
         await ctx.send(await self.utils.turn_off(fan_position))
+
+    @fan.command("stat")
+    @commands.has_permissions(administrator=True)
+    async def fan_stat(self, ctx: commands.Context, fan_position: FanPosition):
+        await ctx.send(await self.utils.get_stat(fan_position))

@@ -56,3 +56,9 @@ class FanUtils(CogsExtension):
             )
 
         return f"Turned off fan {fan_position.name}"
+
+    async def get_stat(self, fan_position: FanPosition) -> dict:
+        async with Client(MQTT_BROKER, MQTT_PORT) as client:
+            await client.subscribe(f"{self.TOPIC_PREFIX}/{fan_position}")
+            async for message in client.messages:
+                return json.loads(message.payload)
